@@ -1,0 +1,10 @@
+
+aws_region         = "us-east-2"
+project_name       = "iac-homework"
+environment        = "dev"
+deployment_id      = "juan"
+instance_type      = "t3.micro"
+vpc_cidr           = "10.0.0.0/16"
+public_subnet_cidr = "10.0.1.0/24"
+
+web_message = "Hi, I am Juan Jose and this is my IaC"
