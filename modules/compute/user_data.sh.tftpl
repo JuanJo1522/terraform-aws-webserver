@@ -2,10 +2,14 @@
 #!/bin/bash
 set -euxo pipefail
 
-dnf update -y
+exec > >(tee /var/log/webserver-setup.log | logger -t user-data -s 2>/dev/console) 2>&1
 
+echo "Starting web server installation"
+
+# Install Nginx
 dnf install -y nginx
 
+# Create HTML page
 cat > /usr/share/nginx/html/index.html <<'EOF'
 <!DOCTYPE html>
 <html lang="en">
@@ -20,5 +24,12 @@ cat > /usr/share/nginx/html/index.html <<'EOF'
 </html>
 EOF
 
+# Enable and start Nginx
 systemctl enable nginx
 systemctl start nginx
+
+# Verify Nginx
+systemctl is-active nginx
+curl --fail http://localhost
+
+echo "Web server installation completed successfully"
