@@ -1,22 +1,17 @@
 
 #!/bin/bash
-set -euxo pipefail
+set -eux
 
-exec > >(tee /var/log/webserver-setup.log | logger -t user-data -s 2>/dev/console) 2>&1
+echo "User data execution started" > /var/log/webserver-test.log
 
-echo "Starting web server installation"
+mkdir -p /opt/webserver
 
-# Install Nginx
-dnf install -y nginx
-
-# Create HTML page
-cat > /usr/share/nginx/html/index.html <<'EOF'
+cat > /opt/webserver/index.html <<'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terraform AWS Web Server</title>
+    <title>Terraform Web Server</title>
 </head>
 <body>
     <h1>${web_message}</h1>
@@ -24,12 +19,9 @@ cat > /usr/share/nginx/html/index.html <<'EOF'
 </html>
 EOF
 
-# Enable and start Nginx
-systemctl enable nginx
-systemctl start nginx
+cd /opt/webserver
 
-# Verify Nginx
-systemctl is-active nginx
-curl --fail http://localhost
+nohup python3 -m http.server 80 --bind 0.0.0.0 \
+  > /var/log/python-webserver.log 2>&1 < /dev/null &
 
-echo "Web server installation completed successfully"
+echo "User data execution completed" >> /var/log/webserver-test.log
